@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Student ID Card System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+     * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+            color: #333;
+            padding: 10px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ffd700;
+        }
+        
+        h1 {
+            color: #1a2a6c;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .subtitle {
+            color: #b21f1f;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 2px;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(to right, #b21f1f, #d62828);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: linear-gradient(to right, #1a2a6c, #3a5fcd);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 3px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .action-btn.print {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+        }
+        
+        .action-btn.download {
+            background: linear-gradient(to right, #2980b9, #3498db);
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .card-container {
+            perspective: 1000px;
+            height: 420px;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .card-container:hover .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-front {
+            background: linear-gradient(135deg, #1a2a6c, #3a5fcd);
+            color: white;
+            border: 3px solid #ffd700;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-back {
+            background: linear-gradient(135deg, #b21f1f, #d62828);
+            color: white;
+            transform: rotateY(180deg);
+            border: 3px solid #ffd700;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        
+        .card-header {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 10px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .school-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .card-body {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .photo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .student-photo {
+            width: 100px;
+            height: 120px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px solid white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .student-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-placeholder {
+            color: #6c757d;
+            font-size: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .id-number {
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px;
+            border-radius: 3px;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        
+        .student-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            padding-bottom: 8px;
+        }
+        
+        .student-details {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        
+        .detail-value {
+            font-weight: 500;
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.25);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .validity {
+            font-style: italic;
+            font-weight: 600;
+        }
+        
+        .qr-code {
+            width: 160px;
+            height: 160px;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .qr-label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 10px;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+        }
+        
+        .verification-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border: 2px solid #27ae60;
+            text-align: center;
+        }
+        
+        .verification-content {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+        
+        .verification-header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a2a6c;
+        }
+        
+        .verification-title {
+            color: #1a2a6c;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .verification-subtitle {
+            color: #27ae60;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .verification-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .verification-photo {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .verification-details {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .detail-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            border-left: 3px solid #1a2a6c;
+        }
+        
+        .detail-card h3 {
+            color: #1a2a6c;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .detail-card p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .verification-status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 8px;
+            border: 1px solid #2ecc71;
+        }
+        
+        .status-text {
+            font-size: 16px;
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        .single-card-view {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        /* Larger screens */
+        @media (min-width: 768px) {
+            header {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .tab-btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            
+            .action-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            .card-body {
+                padding: 20px;
+            }
+            
+            .student-photo {
+                width: 120px;
+                height: 140px;
+            }
+            
+            .verification-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+            
+            .verification-details {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .container {
+                padding: 20px;
+            }
+            
+            header {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+            
+            .student-photo {
+                width: 140px;
+                height: 160px;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding: 5px;
+            }
+            
+            header, .tabs, .actions, .verification-section {
+                display: none;
+            }
+            
+            .tab-content {
+                display: block !important;
+            }
+            
+            .card-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .card-container {
+                height: auto;
+                perspective: none;
+                break-inside: avoid;
+            }
+            
+            .card-inner {
+                transform: none !important;
+                height: auto;
+            }
+            
+            .card-front, .card-back {
+                position: relative;
+                height: auto;
+                margin-bottom: 10px;
+                -webkit-backface-visibility: visible;
+                backface-visibility: visible;
+                transform: none !important;
+                page-break-inside: avoid;
+            }
+            
+            .card-back {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-id-card"></i> School Student ID Card System</h1>
+            <p class="subtitle">Generate, Print, and Verify Student ID Cards</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="id-cards">ID Cards</button>
+            <button class="tab-btn" data-tab="verification">QR Verification</button>
+        </div>
+        
+        <div class="tab-content active" id="id-cards">
+            <div class="actions">
+                <button class="action-btn print" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print All ID Cards
+                </button>
+                <button class="action-btn download" id="downloadAll">
+                    <i class="fas fa-download"></i> Download All QR Codes
+                </button>
+            </div>
+            
+            <div id="singleCardContainer" class="single-card-view" style="display: none;">
+                <!-- Single card will be shown here when viewing from QR link -->
+            </div>
+            
+            <div class="card-grid" id="cardsContainer">
+                <!-- ID Cards will be generated here -->
+            </div>
+        </div>
+        
+        <div class="tab-content" id="verification">
+            <div class="verification-section">
+                <div class="verification-content">
+                    <div class="verification-header">
+                        <h2 class="verification-title">Student ID Verification</h2>
+                        <p class="verification-subtitle">Scan QR Code to View Student Information</p>
+                    </div>
+                    
+                    <div class="verification-grid">
+                        <div class="verification-photo">
+                            <div class="photo-placeholder">Student Photo</div>
+                        </div>
+                        
+                        <div class="verification-details" id="verificationDetails">
+                            <!-- Verification details will appear here -->
+                        </div>
+                    </div>
+                    
+                    <div class="verification-status">
+                        <p class="status-text" id="statusText">Scan a student ID QR code to verify information</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for 20 students
+        const students = [
+            { id: "STU2025001", name: "Raj Sharma", class: "10-A", roll: "25", dob: "15/08/2009", blood: "O+", father: "Amit Sharma", address: "12 Gandhi Road, Delhi", valid: "31/05/2026" },
+            { id: "STU2025002", name: "Priya Patel", class: "9-B", roll: "12", dob: "22/03/2010", blood: "B+", father: "Sanjay Patel", address: "34 Nehru Street, Mumbai", valid: "31/05/2026" },
+            { id: "STU2025003", name: "Amit Kumar", class: "11-C", roll: "08", dob: "05/12/2008", blood: "A+", father: "Vijay Kumar", address: "56 Tagore Lane, Kolkata", valid: "31/05/2026" },
+            { id: "STU2025004", name: "Sneha Singh", class: "12-A", roll: "03", dob: "18/07/2007", blood: "AB+", father: "Rajesh Singh", address: "78 Bose Road, Chennai", valid: "31/05/2026" },
+            { id: "STU2025005", name: "Vikram Mehta", class: "8-B", roll: "19", dob: "30/01/2011", blood: "O-", father: "Anil Mehta", address: "90 Patel Nagar, Bangalore", valid: "31/05/2026" },
+            { id: "STU2025006", name: "Ananya Das", class: "10-C", roll: "07", dob: "12/09/2009", blood: "A-", father: "Sourav Das", address: "112 Vivekananda Road, Hyderabad", valid: "31/05/2026" },
+            { id: "STU2025007", name: "Rahul Verma", class: "9-A", roll: "15", dob: "25/04/2010", blood: "B-", father: "Manoj Verma", address: "134 Gandhi Nagar, Pune", valid: "31/05/2026" },
+            { id: "STU2025008", name: "Neha Gupta", class: "11-B", roll: "22", dob: "08/11/2008", blood: "O+", father: "Rajiv Gupta", address: "156 Nehru Place, Jaipur", valid: "31/05/2026" },
+            { id: "STU2025009", name: "Arjun Reddy", class: "12-C", roll: "11", dob: "19/02/2007", blood: "A+", father: "Vikram Reddy", address: "178 Tagore Street, Ahmedabad", valid: "31/05/2026" },
+            { id: "STU2025010", name: "Pooja Mishra", class: "8-A", roll: "05", dob: "14/06/2011", blood: "AB-", father: "Avinash Mishra", address: "190 Bose Lane, Lucknow", valid: "31/05/2026" },
+            { id: "STU2025011", name: "Suresh Yadav", class: "10-B", roll: "17", dob: "03/10/2009", blood: "B+", father: "Mahesh Yadav", address: "202 Patel Road, Surat", valid: "31/05/2026" },
+            { id: "STU2025012", name: "Meera Joshi", class: "9-C", roll: "09", dob: "27/05/2010", blood: "O+", father: "Sunil Joshi", address: "224 Vivekananda Nagar, Kanpur", valid: "31/05/2026" },
+            { id: "STU2025013", name: "Karan Malhotra", class: "11-A", roll: "14", dob: "10/12/2008", blood: "A-", father: "Rakesh Malhotra", address: "246 Gandhi Street, Nagpur", valid: "31/05/2026" },
+            { id: "STU2025014", name: "Divya Rao", class: "12-B", roll: "06", dob: "21/08/2007", blood: "AB+", father: "Vishal Rao", address: "268 Nehru Lane, Indore", valid: "31/05/2026" },
+            { id: "STU2025015", name: "Rohit Saxena", class: "8-C", roll: "21", dob: "07/03/2011", blood: "O-", father: "Anuj Saxena", address: "290 Tagore Road, Thane", valid: "31/05/2026" },
+            { id: "STU2025016", name: "Shreya Iyer", class: "10-D", roll: "13", dob: "29/11/2009", blood: "B-", father: "Rajeev Iyer", address: "312 Bose Nagar, Bhopal", valid: "31/05/2026" },
+            { id: "STU2025017", name: "Vishal Choudhary", class: "9-D", roll: "18", dob: "16/07/2010", blood: "A+", father: "Sanjay Choudhary", address: "334 Patel Lane, Patna", valid: "31/05/2026" },
+            { id: "STU2025018", name: "Anjali Desai", class: "11-D", roll: "04", dob: "09/04/2008", blood: "O+", father: "Nitin Desai", address: "356 Vivekananda Street, Vadodara", valid: "31/05/2026" },
+            { id: "STU2025019", name: "Sanjay Kapoor", class: "12-D", roll: "16", dob: "24/01/2007", blood: "AB-", father: "Vikram Kapoor", address: "378 Gandhi Place, Ghaziabad", valid: "31/05/2026" },
+            { id: "STU2025020", name: "Kavita Rana", class: "8-D", roll: "10", dob: "13/09/2011", blood: "B+", father: "Raj Rana", address: "400 Nehru Road, Ludhiana", valid: "31/05/2026" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if we're coming from a QR code scan
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('id');
+            
+            if (studentId) {
+                // Find the student with this ID
+                const student = students.find(s => s.id === studentId);
+                if (student) {
+                    // Show only this student's card
+                    showSingleStudentCard(student);
+                } else {
+                    // If student not found, show all cards
+                    generateStudentCards();
+                }
+            } else {
+                // Generate all student ID cards normally
+                generateStudentCards();
+            }
+            
+            // Set up tab switching
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    
+                    // Show selected tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Set up download all QR codes button
+            document.getElementById('downloadAll').addEventListener('click', function() {
+                alert('All QR codes downloaded successfully! In a real application, this would download ZIP file with all QR codes.');
+            });
+        });
+
+        function generateStudentCards() {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+            
+            // Hide single card view
+            document.getElementById('singleCardContainer').style.display = 'none';
+            // Show card grid
+            container.style.display = 'grid';
+            
+            students.forEach(student => {
+                const cardHtml = createStudentCardHtml(student);
+                container.innerHTML += cardHtml;
+                
+                // Generate QR code after element is added to DOM
+                setTimeout(() => {
+                    generateQRCodeForStudent(student);
+                }, 100);
+            });
+        }
+
+        function showSingleStudentCard(student) {
+            // Hide the card grid
+            document.getElementById('cardsContainer').style.display = 'none';
+            
+            // Show single card container
+            const singleCardContainer = document.getElementById('singleCardContainer');
+            singleCardContainer.style.display = 'flex';
+            
+            // Create and display the single card
+            singleCardContainer.innerHTML = createStudentCardHtml(student);
+            
+            // Generate QR code for this single card
+            setTimeout(() => {
+                generateQRCodeForStudent(student);
+            }, 100);
+            
+            // Also show verification details
+            showVerification(student);
+        }
+
+        function createStudentCardHtml(student) {
+            return `
+                <div class="card-container">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <div class="card-header">
+                                <div class="school-name">Modern Public School</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="photo-section">
+                                    <div class="student-photo">
+                                        <div class="photo-placeholder">Student Photo</div>
+                                    </div>
+                                    <div class="id-number">ID: ${student.id}</div>
+                                </div>
+                                <div class="details-section">
+                                    <div class="student-name">${student.name}</div>
+                                    <div class="student-details">
+                                        <div><span class="detail-label">Class:</span> ${student.class}</div>
+                                        <div><span class="detail-label">Roll No:</span> ${student.roll}</div>
+                                        <div><span class="detail-label">DOB:</span> ${student.dob}</div>
+                                        <div><span class="detail-label">Blood Group:</span> ${student.blood}</div>
+                                        <div><span class="detail-label">Father:</span> ${student.father}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="validity">Valid through: ${student.valid}</div>
+                                <div>Principal's Signature</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-back">
+                            <div class="qr-code" id="qr-${student.id}"></div>
+                            <div class="qr-label">Scan to Verify Student ID</div>
+                            <div class="school-name" style="margin-top: 20px;">Modern Public School</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateQRCodeForStudent(student) {
+            const qrContainer = document.getElementById(`qr-${student.id}`);
+            if (qrContainer) {
+                // Clear any existing QR code
+                qrContainer.innerHTML = '';
+                
+                // Create QR code with student data
+                // Instead of the full student data, we'll just encode a URL with the student ID
+                const verificationUrl = `${window.location.origin}${window.location.pathname}?id=${student.id}`;
+                new QRCode(qrContainer, {
+                    text: verificationUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                // Add click event to simulate scan
+                qrContainer.addEventListener('click', function() {
+                    showVerification(student);
+                });
+            }
+        }
+
+        function showVerification(student) {
+            // Switch to verification tab
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-tab="verification"]').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('verification').classList.add('active');
+            
+            // Scroll to verification section
+            document.getElementById('verification').scrollIntoView({ behavior: 'smooth' });
+            
+            // Update verification details
+            const detailsHtml = `
+                <div class="detail-card">
+                    <h3>Student Information</h3>
+                    <p><strong>Name:</strong> ${student.name}</p>
+                    <p><strong>Class:</strong> ${student.class}</p>
+                    <p><strong>Roll No:</strong> ${student.roll}</p>
+                    <p><strong>Student ID:</strong> ${student.id}</p>
+                </div>
+                
+                <div class="detail-card">
+                    <h3>Personal Details</h3>
+                    <p><strong>Date of Birth:</strong> ${student.dob}</p>
+                    <p><strong>Blood Group:</strong> ${student.blood}</p>
+                    <p><strong>Father's Name:</strong> ${student.father}</p>
+                </div>
+                
+                <div class="detail-card">
+                    <h3>Validity</h3>
+                    <p><strong>Valid Through:</strong> ${student.valid}</p>
+                    <p><strong>Issued Date:</strong> 01/06/2025</p>
+                    <p><strong>Status:</strong> Active</p>
+                </div>
+                
+                <div class="detail-card">
+                    <h3>Contact Information</h3>
+                    <p><strong>Address:</strong> ${student.address}</p>
+                    <p><strong>Phone:</strong> +91 XXXXX XXXXX</p>
+                    <p><strong>Email:</strong> student@school.edu</p>
+                </div>
+            `;
+            
+            document.getElementById('verificationDetails').innerHTML = detailsHtml;
+            document.getElementById('statusText').innerHTML = `<i class="fas fa-check-circle"></i> ID Verified Successfully!`;
+        }
+
+
+
+
+        function showSingleStudentCard(student) {
+    // Hide the card grid
+    document.getElementById('cardsContainer').style.display = 'none';
+    
+    // Show single card container
+    const singleCardContainer = document.getElementById('singleCardContainer');
+    singleCardContainer.style.display = 'flex';
+    
+    // Create and display the single card
+    singleCardContainer.innerHTML = createStudentCardHtml(student);
+    
+    // Generate QR code for this single card
+    setTimeout(() => {
+        generateQRCodeForStudent(student);
+    }, 100);
+    
+    // Also show verification details automatically
+    showVerification(student);
+}
+    </script>
+</body>
+</html>
